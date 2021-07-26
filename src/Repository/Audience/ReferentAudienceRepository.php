@@ -5,7 +5,7 @@ namespace App\Repository\Audience;
 use App\Entity\Audience\ReferentAudience;
 use Doctrine\Persistence\ManagerRegistry;
 
-class ReferentAudienceRepository extends AbstractAudienceRepository
+class ReferentAudienceRepository extends AudienceRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

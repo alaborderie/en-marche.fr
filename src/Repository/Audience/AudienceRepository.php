@@ -2,10 +2,23 @@
 
 namespace App\Repository\Audience;
 
+use App\Entity\Audience\AbstractAudience;
+use App\Entity\Audience\AudienceInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-abstract class AbstractAudienceRepository extends ServiceEntityRepository
+class AudienceRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, AbstractAudience::class);
+    }
+
+    public function findByUuid(string $uuid): AudienceInterface
+    {
+        return $this->findOneBy(['uuid' => $uuid]);
+    }
+
     public function findByZones(array $zones): array
     {
         $qb = $this->createQueryBuilder('audience');
