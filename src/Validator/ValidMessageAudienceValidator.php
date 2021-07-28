@@ -2,7 +2,7 @@
 
 namespace App\Validator;
 
-use App\AdherentMessage\AdherentMessageTypeEnum;
+use App\Audience\AudienceHelper;
 use App\Entity\AdherentMessage\AdherentMessageInterface;
 use App\Security\Voter\Audience\ManageAudienceVoter;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -34,9 +34,18 @@ class ValidMessageAudienceValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, AdherentMessageInterface::class);
         }
 
+        $messageClass = AudienceHelper::getMessageClassName(\get_class($value->getAudience()));
+        if (!$value instanceof $messageClass) {
+            $this->context
+                ->buildViolation($constraint->messageNotValidClass)
+                ->atPath('audience')
+                ->addViolation()
+            ;
+        }
+
         if (!$this->authorizationChecker->isGranted(ManageAudienceVoter::PERMISSION, $value->getAudience())) {
             $this->context
-                ->buildViolation($constraint->message)
+                ->buildViolation($constraint->messageNoRights)
                 ->atPath('audience')
                 ->addViolation()
             ;

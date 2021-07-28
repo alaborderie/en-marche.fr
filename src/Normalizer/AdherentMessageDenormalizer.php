@@ -3,11 +3,9 @@
 namespace App\Normalizer;
 
 use App\AdherentMessage\AdherentMessageFactory;
-use App\AdherentMessage\AdherentMessageTypeEnum;
-use App\AdherentMessage\Filter\FilterFactory;
 use App\Entity\AdherentMessage\AbstractAdherentMessage;
 use App\Entity\AdherentMessage\AdherentMessageInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\Audience\AudienceRepository;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
@@ -20,11 +18,11 @@ class AdherentMessageDenormalizer implements DenormalizerInterface, Denormalizer
 
     private const ADHERENT_MESSAGE_DENORMALIZER_ALREADY_CALLED = 'ADHERENT_MESSAGE_DENORMALIZER_ALREADY_CALLED';
 
-    private $entityManager;
+    private $audienceRepository;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(AudienceRepository $audienceRepository)
     {
-        $this->entityManager = $entityManager;
+        $this->audienceRepository = $audienceRepository;
     }
 
     public function denormalize($data, $type, $format = null, array $context = [])
@@ -45,26 +43,15 @@ class AdherentMessageDenormalizer implements DenormalizerInterface, Denormalizer
 
         unset($data['type']);
 
-//        if (isset($data['audience'])) {
-//            $audience = $this->entityManager->getRepository(AdherentMessageTypeEnum::AUDIENCE_CLASSES[$messageType])->findByUuid($data['audience']);
-//        }
+        $audience = null;
+        if (isset($data['audience'])) {
+            $audience = $this->audienceRepository->findByUuid($data['audience']);
+            if (!$audience) {
+                throw new \InvalidArgumentException(sprintf('Audience with uuid "%s" does not exist', $data['audience']));
+            }
 
-//        $filterByAudience = null;
-//        if (isset($data['audience'])) {
-//            if (!isset(AdherentMessageTypeEnum::AUDIENCE_CLASSES[$messageType])) {
-//                throw new \InvalidArgumentException(sprintf('No audience type for message type "%s" is undefined', $messageType));
-//            }
-//
-//            $audience = $this->entityManager->getRepository(AdherentMessageTypeEnum::AUDIENCE_CLASSES[$messageType])->findByUuid($data['audience']);
-//
-//            if (!$audience) {
-//                throw new UnexpectedValueException(sprintf('Audience with uuid "%s" not found', $data['audience']));
-//            }
-//
-//            $filterByAudience = FilterFactory::createFromAudience($audience);
-//
-//            unset($data['audience']);
-//        }
+            unset($data['audience']);
+        }
 
         $context[self::ADHERENT_MESSAGE_DENORMALIZER_ALREADY_CALLED] = true;
 
@@ -72,13 +59,9 @@ class AdherentMessageDenormalizer implements DenormalizerInterface, Denormalizer
         $message = $this->denormalizer->denormalize($data, $messageClass, $format, $context);
 
         $message->setSource(AdherentMessageInterface::SOURCE_API);
-//        if ($audience) {
-//            $message->setAudience($audience);
-//        }
-//        dd($message);
-//        if ($filterByAudience) {
-//            $message->setFilter($filterByAudience);
-//        }
+        if ($audience) {
+            $message->setAudience($audience);
+        }
 
         return $message;
     }

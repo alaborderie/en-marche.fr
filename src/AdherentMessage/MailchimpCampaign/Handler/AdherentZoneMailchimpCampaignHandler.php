@@ -6,6 +6,7 @@ use App\AdherentMessage\Filter\AdherentMessageFilterInterface;
 use App\Entity\AdherentMessage\AdherentMessageInterface;
 use App\Entity\AdherentMessage\DeputyAdherentMessage;
 use App\Entity\AdherentMessage\Filter\AdherentZoneFilter;
+use App\Entity\AdherentMessage\Filter\AudienceFilter;
 use App\Entity\AdherentMessage\LegislativeCandidateAdherentMessage;
 use App\Entity\AdherentMessage\SenatorAdherentMessage;
 
@@ -20,11 +21,11 @@ class AdherentZoneMailchimpCampaignHandler extends AbstractMailchimpCampaignHand
     }
 
     /**
-     * @param AdherentMessageFilterInterface|AdherentZoneFilter $filter
+     * @param AdherentMessageFilterInterface|AdherentZoneFilter|AudienceFilter $filter
      */
     protected function getCampaignFilters(AdherentMessageFilterInterface $filter): array
     {
-        $tag = $filter->getReferentTag();
+        $tag = $filter instanceof AudienceFilter ? $filter->getZone()->getReferentTags()->first() : $filter->getReferentTag();
 
         $staticSegmentCondition = [
             'type' => 'static_segment',
