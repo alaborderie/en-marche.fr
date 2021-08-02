@@ -422,6 +422,14 @@
             </call>
         </service>
 
+        <service id="app.admin.riposte" class="App\Admin\RiposteAdmin">
+            <tag name="sonata.admin" manager-type="orm" label="Ripostes" group="Je marche app" />
+
+            <argument />
+            <argument>App\Entity\Riposte</argument>
+            <argument />
+        </service>
+
         <!--
         ######################################################
         # Instances
