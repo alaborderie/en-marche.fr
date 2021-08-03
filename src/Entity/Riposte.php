@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -9,6 +10,24 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
+ *
+ * @ApiResource(
+ *     attributes={
+ *         "access_control": "is_granted('ROLE_ADHERENT')",
+ *     },
+ *     collectionOperations={
+ *         "get": {
+ *             "path": "/v3/ripostes",
+ *         },
+ *     },
+ *     itemOperations={
+ *         "get": {
+ *             "path": "/v3/ripostes/{id}",
+ *             "access_control": "is_granted('ROLE_ADHERENT')",
+ *             "requirements": {"id": "%pattern_uuid%"},
+ *         },
+ *     }
+ * )
  */
 class Riposte
 {

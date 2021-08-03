@@ -30,12 +30,12 @@ class LoadRiposteData extends Fixture
             null,
             '-1 minute'
         );
-        $riposteTodayWithoutNotification = $this->createRiposte(
+        $riposte12hoursWithoutNotification = $this->createRiposte(
             self::RIPOSTE_3_UUID,
-            'La riposte d\'aujourd\'hui sans URL et notification',
-            'Le texte de la riposte d\'aujourd\'hui',
+            'La riposte sans URL et notification',
+            'Le texte de la riposte sans URL et notification',
             null,
-            '-2 minutes',
+            '-12 hours',
             false
         );
         $riposteTodayDisabled = $this->createRiposte(
@@ -47,18 +47,18 @@ class LoadRiposteData extends Fixture
             true,
             false
         );
-        $riposteYesterday = $this->createRiposte(
+        $riposte2daysAgo = $this->createRiposte(
             self::RIPOSTE_5_UUID,
-            'La riposte d\'hier avec un URL et notification',
-            'Le texte de la riposte d\'hier avec un lien http://riposte.fr',
-            'a-repondre-hier.fr',
+            'La riposte d\'avant-hier avec un URL et notification',
+            'Le texte de la riposte d\'avant-hier avec un lien http://riposte.fr',
+            'a-repondre-avant-hier.fr',
         );
 
         $manager->persist($riposteTodayLast);
         $manager->persist($riposteTodayWithoutUrl);
-        $manager->persist($riposteTodayWithoutNotification);
+        $manager->persist($riposte12hoursWithoutNotification);
         $manager->persist($riposteTodayDisabled);
-        $manager->persist($riposteYesterday);
+        $manager->persist($riposte2daysAgo);
 
         $manager->flush();
     }
